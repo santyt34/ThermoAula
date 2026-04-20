@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThermoAula IoT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neon: { green: '#39ff14', cyan: '#00fff5', red: '#ff3c3c' },
+                        dark: { 900: '#060b14', 800: '#0c1627', 700: '#112036', 950: '#03050a' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #060b14;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(12, 22, 39, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 255, 245, 0.15);
+        }
+
+        .flow-line {
+            stroke-dasharray: 8 8;
+            animation: dash-flow 1s linear infinite;
+        }
+
+        @keyframes dash-flow {
+            to {
+                stroke-dashoffset: -16;
+            }
+        }
+
+        @keyframes spin-fan {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fan-spin-fast {
+            animation: spin-fan 0.3s linear infinite;
+        }
+
+        .fan-spin-slow {
+            animation: spin-fan 1.5s linear infinite;
+        }
+
+        .chart-bar-hover:hover {
+            height: 75% !important;
+            background-color: #00fff5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #060b14;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00fff5;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-neon-cyan selection:text-dark-900">
+
+    <header class="fixed top-0 w-full z-50 glass border-b border-neon-cyan/10 backdrop-blur-xl">
+        <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded bg-gradient-to-br from-neon-green to-neon-cyan flex items-center justify-center font-bold text-dark-900 shadow-[0_0_15px_#00fff5]">
+                    IoT</div>
+                <span class="font-bold tracking-tight text-white text-lg">Thermo<span
+                        class="text-neon-green">Aula</span></span>
+            </div>
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
+                <a href="#hero" class="hover:text-neon-cyan transition-colors">Inicio</a>
+                <a href="#fase1" class="hover:text-neon-green transition-colors">Híbrida</a>
+                <a href="#regla1" class="hover:text-neon-red transition-colors">Automática</a>
+                <a href="#fase2" class="hover:text-blue-400 transition-colors">Nube API</a>
+                <a href="#seguridad" class="hover:text-white transition-colors">Accesos</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="flex flex-col lg:flex-row w-full min-h-screen pt-16">
+
+        <!-- LEFT TEXT COLUMN -->
+        <div class="w-full lg:w-5/12 xl:w-1/3 px-8 lg:px-16 py-12 flex flex-col z-20">
+            <section id="hero" class="min-h-[85vh] flex flex-col justify-center border-l-4 border-transparent">
+                <div
+                    class="inline-block px-3 py-1 bg-neon-cyan/10 border border-neon-cyan/30 text-neon-cyan text-xs font-bold uppercase tracking-widest rounded-full w-max mb-6 animate-pulse">
+                    Proyecto IoT</div>
+                <h1 class="text-5xl font-extrabold mb-6 tracking-tight text-white drop-shadow-lg">Automatización
+                    <br><span class="text-neon-cyan">Térmica Universitaria</span>
+                </h1>
+                <p class="text-lg text-slate-400 mb-10 leading-relaxed font-light">Implementación de un ecosistema IoT
+                    para el control de la temperatura en aulas de clase mediante ventiladores activados por sensores
+                    y monitorización móvil avanzada.</p>
+            </section>
+
+            <section id="fase1" class="min-h-screen flex flex-col justify-center border-l-4 border-neon-green pl-8">
+                <h2 class="text-4xl font-bold mb-4 text-white">Fase 1 Inicial: <br><span class="text-neon-green">Control
+                        Local Bluetooth</span></h2>
+                <p class="text-slate-300 mb-4">La operación local se realiza dinámicamente mediante una aplicación
+                    móvil.</p>
+                <div
+                    class="p-4 bg-dark-800 rounded-xl border border-neon-green/30 text-[15px] text-slate-400 shadow-[0_0_20px_rgba(57,255,20,0.1)]">
+                    La interfaz provee telemetría vinculada vía Bluetooth, aportando datos de la unidad Sensorial T°
+                    🌡️, Detección de
+                    Personas aproximada 👥, frecuencia y franjas horarias de inyección energética. Adicionalmente, el
+                    sistema
+                    cuenta con envío de alertas sobre eventos clave de hardware o ingresos de administrativos
+                    autorizados.
+                </div>
+            </section>
+
+            <section id="intermedio"
+                class="min-h-[40vh] flex flex-col justify-center border-l-4 border-slate-500 pl-8 opacity-90 py-8">
+                <h3 class="text-2xl font-bold mb-3 text-slate-300">Infraestructura:<br>Sensores Perpetuos 👁️</h3>
+                <p class="text-[15px] text-slate-400 leading-relaxed">
+                    A través tanto de la Fase 1 como de la Fase 2 en adelante, la lectura en placa de los sensores de
+                    <b>Temperatura</b> y <b>Movimiento</b> se mantiene continua e ininterrumpible. Son la capa biológica
+                    del sistema,
+                    proveyendo el recurso de deciciones automatizadas a todo el ecosistema.
+                </p>
+            </section>
+
+            <section id="regla1" class="min-h-screen flex flex-col justify-center border-l-4 border-neon-red pl-8">
+                <h2 class="text-4xl font-bold mb-4 text-white">Fase Secuencial (> 2): <br><span
+                        class="text-neon-red">Refrigeración Crítica</span></h2>
+                <p class="text-lg text-slate-300 mb-4">El botón Bluetooth desaparece delegando la autoridad a una
+                    plataforma algorítmica.</p>
+                <div class="p-4 bg-dark-800 rounded-xl border border-neon-red/30 text-[15px] text-slate-400">
+                    <b>Regla 1:</b> Si la lectura térmica ambiental actual excede el grado centígrado 'X' predefinido,
+                    y concurrentemente los componentes de ocupación perciben presencia y movimiento; el sistema fuerza
+                    la inyección eléctrica al ventilador emitiendo la respectiva advertencia en placa.
+                </div>
+            </section>
+
+            <section id="regla2" class="min-h-screen flex flex-col justify-center border-l-4 border-neon-cyan pl-8">
+                <h2 class="text-4xl font-bold mb-4 text-white">Lógica Sensorial: <br><span class="text-neon-cyan">Modos
+                        Ahorro Lógico</span></h2>
+                <p class="text-[15px] text-slate-300">
+                    Establecimiento de las optimizaciones energéticas para coste cero:<br><br>
+                    <b>Regla 2:</b> Si se detecta temperatura ambiental excesiva pero condición vacía de ocupantes, el
+                    Ventilador rechaza
+                    el consumo encendido manteniéndose apagado.<br><br>
+                    <b>Regla 3:</b> Ante detección activa de ocupantes humanos dentro de un parámetro térmico
+                    frío-estable,
+                    el ventilador permanece inactivo negando un uso irracional de la corriente.
+                </p>
+            </section>
+
+            <section id="fase2" class="min-h-screen flex flex-col justify-center border-l-4 border-blue-500 pl-8">
+                <h2 class="text-4xl font-bold mb-4 text-white">Integración: <br><span class="text-blue-400">Cloud &
+                        Calendar API</span></h2>
+                <p class="text-[15px] text-slate-300 mb-4 leading-relaxed">Las operaciones de la Fase Secuencial se
+                    unifican nativamente con Google Calendar operando en la Nube.</p>
+                <div class="p-4 bg-blue-900/20 border border-blue-500/30 rounded-xl text-sm text-slate-400">
+                    A través de peticiones HTTP, algoritmos directivos pueden inyectar fechas de inactividad 📅
+                    preconfiguradas
+                    (feriados de universidad, vacaciones, clases reprobadas y canceladas) inhibiendo de todo
+                    funcionamiento al nodo físico
+                    para salvaguardar longevidad material.
+                </div>
+            </section>
+
+            <section id="seguridad" class="min-h-screen flex flex-col justify-center border-l-4 border-white pl-8">
+                <h2 class="text-4xl font-bold mb-4 text-white">Seguridad de Red: <br><span class="text-slate-400">Roles
+                        RBAC 🔒</span></h2>
+                <p class="text-[15px] text-slate-300 mb-6 leading-relaxed">
+                    Para la iteración completa Secuencial (Fase 2), se implementa un esquema Multi-Usuario basado en
+                    Roles que bloquea modificaciones malintencionadas. <br><br>
+                    <b>Usuarios Comunes:</b> Control restrictivo. Funcionalidad delimitada exclusivamente a acceso de
+                    información.<br>
+                    <b>Administrativos:</b> Capa ejecutiva. Capaces de inyectar o retener programaciones en la agenda
+                    temporal API y reconfigurar la base paramétrica del ecosistema completo.
+                </p>
+                <div class="space-y-4 relative z-50">
+                    <button onclick="loginApp('admin')"
+                        class="w-full px-6 py-4 bg-dark-800 border border-neon-green/30 text-white font-bold rounded-xl hover:bg-neon-green/10 transition flex items-center justify-between group shadow-lg focus:outline-none">
+                        Login Administrativo <span
+                            class="text-neon-green text-xl group-hover:translate-x-2 transition">&rarr;</span>
+                    </button>
+                    <button onclick="loginApp('user')"
+                        class="w-full px-6 py-4 bg-dark-800 border border-slate-600 text-white font-bold rounded-xl hover:bg-slate-700 transition flex items-center justify-between group shadow-lg focus:outline-none">
+                        Login Usuario <span
+                            class="text-slate-400 text-xl group-hover:translate-x-2 transition">&rarr;</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="analitica" class="min-h-screen flex flex-col justify-center border-l-4 border-yellow-500 pl-8">
+                <h2 class="text-4xl font-bold mb-4 text-white">Consolidación: <br><span
+                        class="text-yellow-400">Archivado de Telemetría 📊</span></h2>
+                <p class="text-[15px] text-slate-300 mb-6 leading-relaxed">
+                    Como un valor agregado crucial de la implementación de hardware, métricas continuas son exportadas
+                    hacia subsistemas gráficos para un archivo perpetuo inter-plataforma.<br><br>
+                    El archivo compila proyecciones temporales de fluctuación térmica vs. densidad probabilística
+                    poblacional a lo largo del huso horario operado por la red.
+                </p>
+            </section>
+
+            <div class="h-[30vh]"></div>
+        </div>
+
+        <!-- RIGHT VISUAL BLOCK (STICKY) -->
+        <div
+            class="w-full lg:w-7/12 xl:w-2/3 h-screen sticky top-0 bg-dark-900 border-l border-white/5 flex items-center justify-center overflow-hidden z-10">
+            <div id="ambient-glow"
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-cyan opacity-5 blur-[150px] rounded-full mix-blend-screen pointer-events-none transition-colors duration-1000">
+            </div>
+
+            <div class="relative w-full max-w-[900px] aspect-video flex items-center justify-center">
+
+                <!-- 1) CLASSROOM DIAGRAM -->
+                <div id="classroom"
+                    class="absolute w-[95%] h-[90%] left-0 border border-slate-700/50 rounded-2xl bg-[rgba(12,22,39,0.3)] shadow-2xl backdrop-blur-md opacity-0 scale-95 transition-all outline outline-1 outline-offset-[10px] outline-slate-800/50">
+                    <div class="absolute bottom-0 w-full h-1/4 border-t border-slate-700/50 bg-dark-900/40"></div>
+
+                    <!-- Sensor Personas -->
+                    <div id="sensor-pir" class="absolute top-8 left-10 flex flex-col items-center">
+                        <div
+                            class="w-10 h-10 rounded-full bg-dark-800 border-2 border-slate-600 flex items-center justify-center z-10 transition-colors">
+                            <div id="sensor-pir-dot" class="w-3 h-3 rounded-full bg-slate-500 transition-colors"></div>
+                        </div>
+                        <div id="sensor-cone"
+                            class="absolute top-6 w-32 h-64 bg-gradient-to-b from-neon-green/20 to-transparent opacity-0 origin-top pointer-events-none"
+                            style="clip-path: polygon(50% 0, 100% 100%, 0 100%);"></div>
+                        <span
+                            class="text-[10px] text-slate-400 mt-1 font-mono font-bold tracking-widest text-center">Detección
+                            de<br>Personas</span>
+                    </div>
+
+                    <!-- Sensor Temp -->
+                    <div id="sensor-temp-hw" class="absolute top-32 left-10 flex flex-col items-center">
+                        <div
+                            class="w-9 h-11 bg-slate-200 border-2 border-slate-400 rounded p-0.5 shadow-md flex flex-wrap gap-[1px]">
+                            <div class="w-full h-2 bg-slate-300"></div>
+                            <div class="w-full h-2 bg-slate-300"></div>
+                            <div class="w-full h-2 bg-slate-300"></div>
+                            <div class="absolute bottom-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full animate-ping"
+                                id="dht-led" style="opacity:0;"></div>
+                        </div>
+                        <span
+                            class="text-[10px] text-slate-400 mt-1 font-mono font-bold tracking-widest">Temperatura</span>
+                    </div>
+
+                    <!-- ESP32 -->
+                    <div id="esp32" class="absolute top-20 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                        <div
+                            class="w-20 h-16 bg-[#1a202c] border-2 border-[#2d3748] rounded-md shadow-xl flex justify-center items-center relative">
+                            <div class="absolute top-2 right-2 w-2 h-2 rounded-full bg-slate-600 transition-colors"
+                                id="esp-led-wifi"></div>
+                            <div class="text-xs text-white uppercase font-black opacity-10">CORE</div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-2 font-mono">Controlador</span>
+                    </div>
+
+                    <!-- Relay -->
+                    <div id="relay" class="absolute top-24 right-40 flex flex-col items-center">
+                        <div
+                            class="w-14 h-16 bg-dark-800 border-2 border-slate-600 rounded flex items-center justify-center transition-colors">
+                            <div id="relay-state" class="font-black text-xs text-slate-500 transition-colors">OFF</div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-1 font-mono">RELÉ DE PODER</span>
+                    </div>
+
+                    <!-- Fan -->
+                    <div id="fan" class="absolute top-6 right-10 z-10 text-center">
+                        <div
+                            class="w-24 h-24 rounded-full border-[3px] border-slate-600 bg-dark-900 flex items-center justify-center shadow-lg relative">
+                            <svg id="fan-blades" class="w-16 h-16 text-slate-500 transition-colors"
+                                viewBox="0 0 100 100">
+                                <g fill="currentColor" transform-origin="50 50">
+                                    <path d="M50 50 L50 10 A40 40 0 0 1 70 15 Z" />
+                                    <path d="M50 50 L90 50 A40 40 0 0 1 85 70 Z" />
+                                    <path d="M50 50 L50 90 A40 40 0 0 1 30 85 Z" />
+                                    <path d="M50 50 L10 50 A40 40 0 0 1 15 30 Z" />
+                                    <circle cx="50" cy="50" r="10" fill="#0c1627" />
+                                </g>
+                            </svg>
+                        </div>
+                        <span class="text-[10px] text-slate-400 block mt-2 font-mono">Ventilador HVAC</span>
+
+                        <div id="air-particles" class="absolute top-12 right-0 w-8 h-32 opacity-0 z-0">
+                            <div class="w-1 h-6 bg-cyan-400/50 absolute left-2 animate-[air-move_0.5s_linear_infinite]">
+                            </div>
+                            <div
+                                class="w-1 h-10 bg-cyan-400/50 absolute left-6 top-4 animate-[air-move_0.4s_linear_infinite]">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wiring Diagram -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none -z-10">
+                        <path d="M 60 70 L 60 110 L 390 110" fill="none" stroke="#1e293b" stroke-width="3" />
+                        <path d="M 50 150 L 390 150" fill="none" stroke="#1e293b" stroke-width="3" />
+                        <path d="M 450 130 L 600 130" fill="none" stroke="#1e293b" stroke-width="4" />
+                        <path d="M 660 130 L 730 130 L 730 90" fill="none" stroke="#1e293b" stroke-width="4" />
+
+                        <!-- Flows -->
+                        <path id="flow-pir" d="M 60 70 L 60 110 L 390 110" fill="none" stroke="#39ff14" stroke-width="3"
+                            class="opacity-0" />
+                        <path id="flow-dht" d="M 50 150 L 390 150" fill="none" stroke="#ff3c3c" stroke-width="3"
+                            class="opacity-0" />
+                        <path id="flow-mid" d="M 450 130 L 600 130" fill="none" stroke="#00fff5" stroke-width="4"
+                            class="opacity-0" />
+                        <path id="flow-end" d="M 660 130 L 730 130 L 730 90" fill="none" stroke="#00fff5"
+                            stroke-width="4" class="opacity-0" />
+                    </svg>
+
+                    <!-- Character -->
+                    <div id="character" class="absolute bottom-1/4 -left-20 opacity-0 text-3xl font-serif">⛹️‍♂️</div>
+                </div>
+
+                <!-- BIG CALENDAR UI (Hidden init) -->
+                <div id="big-calendar-mockup"
+                    class="absolute left-4 top-10 w-[55%] h-[80%] bg-white rounded-2xl border border-slate-200 shadow-2xl opacity-0 flex flex-col pointer-events-none transform -translate-x-20 z-0">
+                    <div class="h-14 border-b border-slate-200 flex items-center px-4 gap-3 bg-slate-50 rounded-t-2xl">
+                        <div
+                            class="w-8 h-8 rounded bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold text-lg">
+                            G</div>
+                        <h2 class="font-sans font-bold text-slate-700 text-sm">EscuelaCalendar API</h2>
+                    </div>
+                    <div class="flex-1 p-4 grid grid-cols-5 gap-2 text-xs text-slate-500">
+                        <div class="col-span-5 flex justify-between font-bold border-b pb-2"><span>Noviembre 2026</span>
+                            <span class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded">Sincronizado</span>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 rounded h-16 p-1">10<br></div>
+                        <div class="bg-slate-50 border border-slate-100 rounded h-16 p-1">11<br></div>
+                        <div class="bg-slate-50 border border-slate-100 rounded h-16 p-1">12<br></div>
+                        <div class="bg-red-50 border border-red-200 rounded h-16 p-1 text-red-500 flex flex-col justify-between"
+                            id="cal-day-err">
+                            <span>13 ⚠️ Feriado</span>
+                            <div class="text-[9px] bg-red-200/50 p-0.5 rounded leading-tight">Mantenimiento y Corte
+                                Eléctrico</div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-100 rounded h-16 p-1">14<br></div>
+                    </div>
+                </div>
+
+                <!-- BUBBLE CONNECTION EXPLANATION -->
+                <svg id="cloud-connection-lines"
+                    class="absolute inset-0 w-full h-full pointer-events-none opacity-0 z-10" viewBox="0 0 900 500">
+                    <path d="M 450 250 Q 550 250 650 350" fill="none" stroke="#3b82f6" stroke-width="4"
+                        stroke-dasharray="8 8" class="animate-[dash-flow_1s_linear_infinite]" />
+                    <circle cx="550" cy="250" r="40" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="2" />
+                    <text x="520" y="255" fill="#3b82f6" font-size="12" font-weight="bold">API JSON</text>
+                </svg>
+
+
+                <!-- 2) SMARTPHONE INTERFACE -->
+                <div id="smartphone-wrapper"
+                    class="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex flex-col opacity-0 transform origin-right">
+
+                    <div id="smartphone"
+                        class="relative w-[340px] h-[680px] bg-dark-900 rounded-[3rem] border-[10px] border-[#161f2e] shadow-[0_45px_100px_rgba(0,0,0,0.9),inset_0_0_20px_rgba(255,255,255,0.05)] transition-transform duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] hover:-translate-x-[160px]">
+
+                        <!-- Hardware Keys -->
+                        <div
+                            class="absolute -right-[14px] top-32 w-1.5 h-16 bg-[#161f2e] rounded-r-md z-0 transition-opacity opacity-70">
+                        </div>
+                        <div
+                            class="absolute -left-[14px] top-24 w-1.5 h-10 bg-[#161f2e] rounded-l-md z-0 transition-opacity opacity-70">
+                        </div>
+                        <div
+                            class="absolute -left-[14px] top-40 w-1.5 h-20 bg-[#161f2e] rounded-l-md z-0 transition-opacity opacity-70">
+                        </div>
+
+                        <!-- Screen Container -->
+                        <div
+                            class="relative w-full h-full rounded-[2.4rem] overflow-hidden bg-dark-950 flex flex-col shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] cursor-pointer group">
+
+                            <!-- Notch -->
+                            <div class="absolute top-0 w-full h-7 flex justify-center z-[70] pointer-events-none">
+                                <div
+                                    class="w-32 h-7 bg-black rounded-b-3xl flex justify-around items-center px-4 shadow-xl border-b border-white/5">
+                                    <div
+                                        class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-white/10 relative shadow-[inset_0_0_2px_#000]">
+                                        <div class="absolute inset-[1px] bg-blue-900/40 rounded-full blur-[0.5px]">
+                                        </div>
+                                    </div>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-[#111] relative">
+                                        <div
+                                            class="w-0.5 h-0.5 bg-green-500 rounded-full absolute top-[1px] right-[1px] shadow-[0_0_2px_#39ff14]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Screen Glare -->
+                            <div
+                                class="absolute inset-0 bg-gradient-to-tr from-white/[0.04] via-transparent to-transparent pointer-events-none z-[60]">
+                            </div>
+
+                            <div class="absolute top-8 w-full px-4 z-40 pointer-events-none">
+                                <div id="app-notif"
+                                    class="bg-dark-800/95 backdrop-blur-md border border-white/10 p-3 rounded-2xl shadow-xl flex items-center gap-3 transform -translate-y-[150%] opacity-0">
+                                    <div id="app-notif-icon" class="text-neon-cyan font-black text-lg">!</div>
+                                    <div>
+                                        <h4 id="app-notif-title" class="text-sm font-bold text-white leading-tight">
+                                            Sistema</h4>
+                                        <p id="app-notif-desc" class="text-[10px] text-slate-400">Notificación</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="relative w-full h-full bg-dark-950 text-white flex flex-col overflow-hidden">
+
+                                <!-- Default Dash Header -->
+                                <div
+                                    class="pt-10 pb-4 px-6 border-b border-white/5 bg-dark-800 flex justify-between items-center z-10 shadow-sm relative shrink-0">
+                                    <div>
+                                        <h2 class="font-bold text-sm">Aula Connect 101</h2>
+                                        <p class="text-[9px] text-cyan-400 flex items-center gap-1"><span
+                                                class="w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse"></span>
+                                            Sistema en
+                                            línea</p>
+                                    </div>
+                                    <div id="app-header-avatar"
+                                        class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs">
+                                        👤
+                                    </div>
+                                </div>
+
+                                <!-- LAYER 1: Dashboard Main (Shared for both roles!) -->
+                                <div id="inner-view-dash"
+                                    class="absolute top-[80px] bottom-0 w-full p-5 overflow-y-auto">
+                                    <h3 class="text-[11px] uppercase font-bold text-slate-500 mb-3 ml-2">Hardware</h3>
+                                    <div class="grid grid-cols-2 gap-3 mb-6">
+                                        <button onclick="navApp('temp')"
+                                            class="group relative bg-dark-800 border border-white/5 hover:border-neon-red/50 rounded-2xl p-4 text-left shadow-sm transition-all overflow-hidden focus:outline-none">
+                                            <span class="text-[9px] uppercase font-bold text-slate-400">Sensor T°</span>
+                                            <div class="text-3xl font-black text-white mt-1 group-hover:text-neon-red transition-colors"
+                                                id="ui-temp-val">22<span class="text-sm">°C</span></div>
+                                            <div class="absolute bottom-2 right-3 text-slate-500 text-[10px] font-bold">
+                                                &rarr;
+                                            </div>
+                                        </button>
+                                        <button onclick="navApp('occ')"
+                                            class="group relative bg-dark-800 border border-white/5 hover:border-neon-cyan/50 rounded-2xl p-4 text-left shadow-sm transition-all overflow-hidden focus:outline-none">
+                                            <span class="text-[9px] uppercase font-bold text-slate-400">Ocupación</span>
+                                            <div class="text-3xl font-black text-white mt-1 group-hover:text-neon-cyan transition-colors"
+                                                id="ui-occ-val">0</div>
+                                            <div class="absolute bottom-2 right-3 text-slate-500 text-[10px] font-bold">
+                                                &rarr;
+                                            </div>
+                                        </button>
+                                    </div>
+
+                                    <div class="bg-dark-800 border border-white/5 rounded-[2rem] p-5 flex flex-col items-center shadow-lg relative min-h-64 transition-all duration-500"
+                                        id="ui-fan-box">
+                                        <span
+                                            class="text-[10px] uppercase font-bold text-slate-500 self-start mb-2">Control
+                                            Ventilador BT 📶</span>
+                                        <button id="ui-toggle-btn" onclick="userManualToggle()"
+                                            class="w-28 h-28 mx-auto mt-4 rounded-full border-[6px] border-dark-900 shadow-[0_0_20px_#000] bg-dark-950 flex items-center justify-center transition-colors hover:scale-[1.03] active:scale-95 duration-200 z-10 focus:outline-none relative origin-center">
+                                            <svg id="ui-toggle-icon"
+                                                class="w-10 h-10 text-slate-600 transition-colors pointer-events-none"
+                                                fill="currentColor" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42A6.92 6.92 0 0119 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-1.93.78-3.68 2.05-4.95L4.63 5.63A8.89 8.89 0 003 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.49-1.01-4.73-2.63-6.33z" />
+                                            </svg>
+                                        </button>
+                                        <div id="ui-fan-status"
+                                            class="mt-8 text-[9px] font-black uppercase bg-dark-900 border border-slate-700 px-3 py-1 rounded text-slate-500 tracking-wider transition-colors duration-500 text-center">
+                                            MÓDULO APAGADO</div>
+                                    </div>
+
+                                    <!-- ADMIN EXCLUSIVE CONFIGURATIONS PANEL -->
+                                    <div id="admin-config-panel" class="mt-6 border-t border-slate-700 pt-6"
+                                        style="display: none;">
+                                        <h3 class="text-sm font-black text-neon-green mb-4">⚙️ Configuración de
+                                            Administrador
+                                        </h3>
+                                        <div class="bg-dark-800 rounded-2xl p-4 border border-blue-500/30 shadow-md mb-4 cursor-pointer hover:border-blue-400/50 hover:bg-dark-700 transition"
+                                            onclick="navApp('calendar')">
+                                            <div class="text-[10px] font-bold text-blue-400 mb-1 flex justify-between">
+                                                Calendario API <span>ABRIR &rarr;</span></div>
+                                            <div class="text-xl text-white font-black truncate">Planificación Calendario
+                                            </div>
+                                        </div>
+                                        <div class="bg-dark-800 rounded-2xl p-4 border border-slate-700">
+                                            <div class="text-xs font-bold text-white mb-4">Límite Tolerancia T° Máx
+                                            </div>
+                                            <input type="range" class="w-full accent-neon-green" value="40">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LAYER 2: TEMP DETAIL -->
+                                <div id="inner-view-temp" class="absolute top-0 w-full h-[680px] bg-dark-900 z-50">
+                                    <div class="pt-10 pb-4 px-4 bg-dark-800 flex items-center gap-3">
+                                        <button onclick="navApp('dash')"
+                                            class="w-8 h-8 flex items-center justify-center bg-dark-900 rounded-full hover:bg-slate-700 focus:outline-none">&larr;</button>
+                                        <div>
+                                            <h2 class="text-sm font-bold">Temperatura</h2>
+                                            <p class="text-[9px] text-slate-400">Detalles Históricos</p>
+                                        </div>
+                                    </div>
+                                    <div class="p-5">
+                                        <h3 class="text-lg font-bold text-white mb-4">Registro en Vivo</h3>
+                                        <div
+                                            class="bg-dark-800 rounded-2xl p-4 border border-slate-700 h-48 flex flex-col justify-between">
+                                            <div
+                                                class="flex justify-between items-center text-xs text-slate-400 font-mono mb-2">
+                                                <span>12:00</span><span>14:00</span><span>16:00</span><span
+                                                    class="text-neon-red font-bold animate-pulse"
+                                                    id="temp-lbl-live">LIVE</span>
+                                            </div>
+                                            <div class="flex flex-1 items-end justify-between px-1 gap-1">
+                                                <div class="w-full bg-slate-600 rounded-t h-[40%] hover:bg-blue-400">
+                                                </div>
+                                                <div class="w-full bg-slate-600 rounded-t h-[45%] hover:bg-blue-400">
+                                                </div>
+                                                <div class="w-full bg-slate-600 rounded-t h-[30%] hover:bg-blue-400">
+                                                </div>
+                                                <div class="w-full bg-slate-600 rounded-t h-[35%] hover:bg-blue-400">
+                                                </div>
+                                                <div class="w-full bg-slate-600 rounded-t h-[50%] hover:bg-blue-400">
+                                                </div>
+                                                <div class="w-full bg-slate-600 rounded-t h-[52%] hover:bg-blue-400">
+                                                </div>
+                                                <div id="chart-bar-live"
+                                                    class="w-full bg-neon-cyan h-[50%] rounded-t shadow-[0_0_8px_inset] shadow-cyan-400/50 transition-all duration-[800ms]">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-sm font-bold text-white mt-8 mb-3">Días Pasados Aleatorios</h3>
+                                        <div class="space-y-2">
+                                            <div
+                                                class="px-3 py-2 bg-dark-800 rounded border border-white/5 flex justify-between text-xs hover:border-slate-500 cursor-pointer">
+                                                <span class="text-slate-400">Lunes 1</span> <span
+                                                    class="text-blue-400 font-mono">Max 25°C</span>
+                                            </div>
+                                            <div
+                                                class="px-3 py-2 bg-dark-800 rounded border border-white/5 flex justify-between text-xs hover:border-slate-500 cursor-pointer">
+                                                <span class="text-slate-400">Martes 2</span> <span
+                                                    class="text-red-400 font-mono">Max 32°C</span>
+                                            </div>
+                                            <div
+                                                class="px-3 py-2 bg-dark-800 rounded border border-white/5 flex justify-between text-xs hover:border-slate-500 cursor-pointer">
+                                                <span class="text-slate-400">Miercoles 3</span> <span
+                                                    class="text-blue-400 font-mono">Max 22°C</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LAYER 2: OCCUPANCY DETAIL -->
+                                <div id="inner-view-occ" class="absolute top-0 w-full h-[680px] bg-dark-900 z-50">
+                                    <div class="pt-10 pb-4 px-4 bg-dark-800 flex items-center gap-3">
+                                        <button onclick="navApp('dash')"
+                                            class="w-8 h-8 flex items-center justify-center bg-dark-900 rounded-full hover:bg-slate-700">&larr;</button>
+                                        <div>
+                                            <h2 class="text-sm font-bold">Ocupación</h2>
+                                            <p class="text-[9px] text-slate-400">Detección de Personas Analítica</p>
+                                        </div>
+                                    </div>
+                                    <div class="p-5">
+                                        <div
+                                            class="flex justify-between items-center mb-6 text-white bg-dark-800 p-3 rounded-xl border border-neon-cyan/20">
+                                            <div class="text-xs text-slate-400 font-bold uppercase">Tránsito Total de
+                                                Hoy</div>
+                                            <div class="text-2xl font-black text-neon-cyan">142 <span
+                                                    class="text-[10px] font-normal text-slate-500">Personas</span></div>
+                                        </div>
+
+                                        <h3 class="text-sm font-bold text-white mb-3">Tasa de Ocupación Viva</h3>
+                                        <div
+                                            class="bg-dark-800 rounded-2xl p-4 border border-slate-700 h-40 flex flex-col justify-between mb-8">
+                                            <div
+                                                class="flex justify-between items-center text-[10px] text-slate-400 font-mono mb-2">
+                                                <span>08:00</span><span>12:00</span><span>18:00</span>
+                                            </div>
+                                            <div class="flex flex-1 items-end justify-between px-1 gap-[3px]">
+                                                <div
+                                                    class="w-full bg-neon-cyan/20 rounded-t h-[20%] hover:bg-neon-cyan transition-colors">
+                                                </div>
+                                                <div
+                                                    class="w-full bg-neon-cyan/20 rounded-t h-[75%] hover:bg-neon-cyan transition-colors">
+                                                </div>
+                                                <div
+                                                    class="w-full bg-neon-cyan/50 rounded-t h-[100%] hover:bg-neon-cyan transition-colors shadow-[0_0_8px_inset] shadow-cyan-400/50">
+                                                </div>
+                                                <div
+                                                    class="w-full bg-neon-cyan/20 rounded-t h-[40%] hover:bg-neon-cyan transition-colors">
+                                                </div>
+                                                <div
+                                                    class="w-full bg-neon-cyan/20 rounded-t h-[60%] hover:bg-neon-cyan transition-colors">
+                                                </div>
+                                                <div
+                                                    class="w-full bg-neon-cyan/20 rounded-t h-[15%] hover:bg-neon-cyan transition-colors">
+                                                </div>
+                                                <div
+                                                    class="w-full bg-neon-cyan/30 rounded-t h-[30%] hover:bg-neon-cyan transition-colors relative">
+                                                    <div
+                                                        class="absolute -top-4 -left-2 text-[8px] bg-cyan-900 px-1 rounded truncate text-white border border-cyan-500">
+                                                        Current</div>
+                                                </div>
+                                                <div
+                                                    class="w-full bg-dark-900 rounded-t h-[90%] border border-dashed border-slate-700">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <h3 class="text-sm font-bold text-white mb-3 flex justify-between">Días
+                                            Anteriores <span class="text-xs text-slate-500 font-normal">Máx Pico</span>
+                                        </h3>
+                                        <div class="space-y-2">
+                                            <div
+                                                class="px-3 py-2 bg-dark-800 rounded border border-white/5 flex gap-4 text-xs items-center hover:border-neon-cyan/50 cursor-pointer transition-colors">
+                                                <span class="text-slate-400 w-16">Jueves 4</span>
+                                                <div
+                                                    class="flex-1 h-1.5 bg-dark-950 border border-slate-700 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-neon-cyan w-[80%]"></div>
+                                                </div>
+                                                <span class="text-white font-mono w-8 text-right">152p</span>
+                                            </div>
+                                            <div
+                                                class="px-3 py-2 bg-dark-800 rounded border border-white/5 flex gap-4 text-xs items-center hover:border-cyan-600/50 cursor-pointer transition-colors">
+                                                <span class="text-slate-400 w-16">Viernes 5</span>
+                                                <div
+                                                    class="flex-1 h-1.5 bg-dark-950 border border-slate-700 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-cyan-600 w-[45%]"></div>
+                                                </div>
+                                                <span class="text-white font-mono w-8 text-right">45p</span>
+                                            </div>
+                                            <div
+                                                class="px-3 py-2 bg-dark-800 rounded border border-white/5 flex gap-4 text-xs items-center hover:border-slate-500 cursor-pointer transition-colors">
+                                                <span class="text-slate-400 w-16">Sábado 6</span>
+                                                <div
+                                                    class="flex-1 h-1.5 bg-dark-950 border border-slate-700 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-slate-600 w-[5%]"></div>
+                                                </div>
+                                                <span class="text-slate-500 font-mono w-8 text-right">2p</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LAYER 3: SECURITY LOCKSCREEN -->
+                                <div id="app-lockscreen"
+                                    class="absolute inset-0 bg-dark-950/90 backdrop-blur-md flex flex-col items-center justify-center z-[60] pointer-events-none opacity-0 transition-opacity duration-300">
+                                    <div
+                                        class="w-16 h-16 rounded-full bg-dark-800 flex items-center justify-center mb-6 shadow-inner animate-pulse">
+                                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-xs text-slate-400">Autenticación Externa Requerida</p>
+                                </div>
+
+                                <!-- Calendar Sub-App (Deep Admin) -->
+                                <div id="inner-view-calendar"
+                                    class="absolute top-0 w-full h-[680px] bg-dark-900 z-[60]">
+                                    <div
+                                        class="pt-10 pb-4 px-4 bg-blue-900/20 border-b border-blue-500/20 flex items-center gap-3">
+                                        <button onclick="navApp('dash')"
+                                            class="w-8 h-8 flex items-center justify-center bg-dark-900/50 rounded-full text-blue-400 hover:bg-blue-900">&larr;</button>
+                                        <div>
+                                            <h2 class="text-sm font-bold text-white">Calendario Adm</h2>
+                                            <p class="text-[9px] text-blue-400">Días inventados configurables</p>
+                                        </div>
+                                    </div>
+                                    <div class="p-5">
+                                        <button
+                                            class="w-full border-2 border-dashed border-slate-600 bg-transparent text-slate-400 py-3 rounded-lg mb-6 hover:border-blue-400 hover:text-blue-400 transition">+
+                                            Añadir Excepción</button>
+                                        <div class="space-y-3">
+                                            <div
+                                                class="bg-red-500/10 border border-red-500/30 p-3 rounded text-xs flex justify-between text-red-200">
+                                                <span class="font-bold">13/11 Feriado</span><span>Riesgo /
+                                                    Limpieza</span>
+                                            </div>
+                                            <div
+                                                class="bg-red-500/10 border border-red-500/30 p-3 rounded text-xs flex justify-between text-red-200">
+                                                <span class="font-bold">25/11 Mantenimiento</span><span>Chequeo HVAC
+                                                </span>
+                                            </div>
+                                            <div
+                                                class="bg-green-500/10 border border-green-500/30 p-3 rounded text-xs flex justify-between text-green-200">
+                                                <span class="font-bold">14/11 Regular</span><span>Día Activo</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRIPT -->
+        <script>
+            gsap.registerPlugin(ScrollTrigger);
+
+            // INITIALIZE APP VIEWS SAFELY OUT OF SIGHT!
+            gsap.set(["#inner-view-temp", "#inner-view-occ", "#inner-view-calendar"], { xPercent: 100 });
+
+            // Core App internal navigation
+            function navApp(target) {
+                gsap.to(["#inner-view-temp", "#inner-view-occ", "#inner-view-calendar"], { xPercent: 100, duration: 0.3 });
+                if (target === 'temp') gsap.to("#inner-view-temp", { xPercent: 0, duration: 0.4, ease: "power2.out" });
+                else if (target === 'occ') gsap.to("#inner-view-occ", { xPercent: 0, duration: 0.4, ease: "power2.out" });
+                else if (target === 'calendar') gsap.to("#inner-view-calendar", { xPercent: 0, duration: 0.4, ease: "power2.out" });
+            }
+
+            // Notification Helper
+            function pushInternalNotif(title, desc, colorHex) {
+                const notif = document.getElementById('app-notif');
+                document.getElementById('app-notif-title').innerText = title;
+                document.getElementById('app-notif-desc').innerText = desc;
+                document.getElementById('app-notif-icon').style.color = colorHex;
+                notif.style.borderColor = colorHex;
+
+                gsap.killTweensOf(notif);
+                gsap.set(notif, { y: "-150%", opacity: 0 });
+                gsap.to(notif, { y: 15, opacity: 1, duration: 0.5, ease: "back.out(1.5)" });
+                gsap.to(notif, { y: "-150%", opacity: 0, duration: 0.4, delay: 3.5 });
+            }
+
+            let isManualOn = false;
+            function userManualToggle() {
+                // Cannot toggle if UI button is hidden via automation phase
+                if (gsap.getProperty("#ui-toggle-btn", "opacity") === 0) return;
+
+                isManualOn = !isManualOn;
+
+                gsap.to("#smartphone-wrapper", { x: 220, duration: 0.5 });
+                gsap.to("#classroom", { x: -180, scale: 0.9, duration: 0.5 });
+
+                if (isManualOn) {
+                    gsap.to("#ui-toggle-btn", { borderColor: "rgba(57,255,20,0.5)", backgroundColor: "rgba(57,255,20,0.1)" });
+                    gsap.to("#ui-toggle-icon", { color: "#39ff14" });
+                    document.getElementById('ui-fan-status').innerText = "ENCENDIDO MANUAL";
+                    document.getElementById('ui-fan-status').style.color = "#39ff14";
+
+                    pushInternalNotif("Interacción BT", "Admin User activó el relé.", "#39ff14");
+                    gsap.to("#relay-state", { textContent: "ON-BT", color: "#39ff14" });
+                    gsap.to("#relay", { borderColor: "#39ff14", backgroundColor: "rgba(57,255,20,0.1)" });
+                    gsap.to("#fan-blades", { className: "+=fan-spin-slow w-16 h-16 text-cyan-400" });
+                    gsap.to("#flow-mid, #flow-end", { className: "+=flow-line opacity-100", stroke: "#00fff5" });
+                    gsap.to("#air-particles", { opacity: 1 });
+                } else {
+                    gsap.to("#ui-toggle-btn", { borderColor: "#03050a", backgroundColor: "#03050a" });
+                    gsap.to("#ui-toggle-icon", { color: "#475569" });
+                    document.getElementById('ui-fan-status').innerText = "APAGADO";
+                    document.getElementById('ui-fan-status').style.color = "#64748b";
+
+                    pushInternalNotif("Interacción BT", "Admin User desactivó relé.", "#64748b");
+                    gsap.to("#relay-state", { textContent: "OFF", color: "#64748b" });
+                    gsap.to("#relay", { borderColor: "rgba(51,65,85,0.5)", backgroundColor: "transparent" });
+                    gsap.to("#fan-blades", { className: "w-16 h-16 text-slate-500" });
+                    gsap.to("#flow-mid, #flow-end", { opacity: 0, className: "-=flow-line" });
+                    gsap.to("#air-particles", { opacity: 0 });
+
+                    gsap.to("#smartphone-wrapper", { x: 120, duration: 1, delay: 1 });
+                    gsap.to("#classroom", { x: -80, scale: 0.85, duration: 1, delay: 1 });
+                }
+            }
+
+            // TIMELINES
+            gsap.set("#classroom", { opacity: 1, scale: 0.9 });
+            gsap.set("#smartphone-wrapper", { opacity: 0, x: 200 });
+
+            ScrollTrigger.create({
+                trigger: "#fase1", start: "top center", end: "bottom center", scrub: 1,
+                onEnter: () => {
+                    gsap.to("#ambient-glow", { backgroundColor: "#39ff14", opacity: 0.1 });
+                    gsap.to("#classroom", { x: -80, scale: 0.85, duration: 0.8 });
+                    gsap.to("#smartphone-wrapper", { opacity: 1, x: 120, scale: 0.95, duration: 0.8 });
+                },
+                onLeaveBack: () => {
+                    gsap.to("#ambient-glow", { backgroundColor: "#00fff5", opacity: 0.05 });
+                    gsap.to("#smartphone-wrapper", { opacity: 0, x: 200, duration: 0.5 });
+                    gsap.to("#classroom", { x: 0, scale: 0.9, duration: 0.8 });
+                }
+            });
+
+            // FASE 2 INICIA EN REGLA 1 (Automatización Sensor)
+            const tlR1 = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#regla1", start: "top center", end: "bottom center", scrub: 1,
+                    onEnter: () => {
+                        gsap.to("#ambient-glow", { backgroundColor: "#ff3c3c", opacity: 0.15 });
+                        gsap.to("#classroom", { borderColor: "rgba(255,60,60,0.4)", backgroundColor: "rgba(255,60,60,0.05)" });
+
+                        // FASE 2: BLOQUEAR BOTÓN BT
+                        if (isManualOn) userManualToggle();
+                        gsap.to("#ui-fan-box", { height: 0, minHeight: 0, opacity: 0, padding: 0, marginTop: 0, marginBottom: 0, overflow: 'hidden', duration: 0.5 });
+                        setTimeout(() => pushInternalNotif("Regla Térmica", "Ventilador Encendido Automático", "#ff3c3c"), 600);
+                    },
+                    onLeaveBack: () => {
+                        gsap.to("#ambient-glow", { backgroundColor: "#39ff14", opacity: 0.1 });
+                        gsap.to("#classroom", { borderColor: "rgba(51,65,85,0.5)", backgroundColor: "rgba(12,22,39,0.3)" });
+
+                        // REVERT FASE 2 BT LOCK
+                        gsap.to("#ui-fan-box", { height: "auto", minHeight: "16rem", opacity: 1, padding: "1.25rem", duration: 0.5 });
+                    }
+                }
+            });
+
+            tlR1.to("#dht-led", { opacity: 1 }, 0.2)
+                .to("#sensor-pir-dot", { backgroundColor: "#ff3c3c" }, 0.5)
+                .to("#sensor-cone", { opacity: 1, backgroundColor: "rgba(255,60,60,0.2)" }, 0.5)
+                .to("#character", { opacity: 1, x: 180, duration: 2 }, 0.5)
+                .to("#ui-temp-val", { textContent: "32", color: "#ff3c3c", snap: { textContent: 1 } }, 1)
+                .to("#ui-occ-val", { textContent: "25", color: "#39ff14", snap: { textContent: 1 } }, 1)
+                .to("#chart-bar-live", { height: "95%", backgroundColor: "#ff3c3c", shadowColor: "#ff3c3c" }, 1)
+                .to("#temp-lbl-live", { color: "#ff3c3c" }, 1)
+                .to("#flow-pir, #flow-dht", { opacity: 1, className: "+=flow-line", stroke: "#ff3c3c" }, 1.5)
+                .to("#relay", { borderColor: "#ff3c3c", backgroundColor: "rgba(255,60,60,0.15)" }, 2)
+                .to("#relay-state", { textContent: "AUTO-ON", color: "#ff3c3c" }, 2)
+                .to("#fan-blades", { className: "+=fan-spin-fast w-16 h-16 text-neon-red" }, 2.5)
+                .to("#flow-mid, #flow-end", { className: "+=flow-line opacity-100", stroke: "#ff3c3c" }, 2.5)
+                .to("#air-particles", { opacity: 1 }, 2.5)
+                .to("#classroom", { x: -140, duration: 1 }, 1);
+
+            const tlR2 = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#regla2", start: "center center", end: "bottom center", scrub: 1,
+                    onEnter: () => {
+                        gsap.to("#ambient-glow", { backgroundColor: "#00fff5", opacity: 0.1 });
+                        setTimeout(() => pushInternalNotif("Protocolo ECO", "Ahorro Activo: Cero presencia.", "#00fff5"), 600);
+                    }
+                }
+            });
+            tlR2.to("#character", { opacity: 0, x: 450, duration: 1.5 }, 0.5)
+                .to("#sensor-pir-dot", { backgroundColor: "#64748b" }, 1)
+                .to("#sensor-cone", { opacity: 0 }, 1)
+                .to("#ui-occ-val", { textContent: "0", color: "#fff", snap: { textContent: 1 } }, 1.5)
+                .to("#flow-pir, #flow-dht", { opacity: 0, className: "-=flow-line" }, 2)
+                .to("#relay", { borderColor: "rgba(51,65,85,0.5)", backgroundColor: "transparent" }, 2)
+                .to("#relay-state", { textContent: "CUT-OFF", color: "#64748b" }, 2)
+                .to("#fan-blades", { className: "w-16 h-16 text-slate-500" }, 2.5)
+                .to("#air-particles", { opacity: 0 }, 2.5);
+
+            const tlNube = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#fase2", start: "center center", end: "bottom center", scrub: 1,
+                    onEnter: () => {
+                        gsap.to("#ambient-glow", { backgroundColor: "#3b82f6", opacity: 0.15 });
+                        gsap.to("#classroom", { opacity: 0, duration: 0.5, scale: 0.5 });
+                        gsap.to("#smartphone-wrapper", { x: 260, duration: 1 });
+                        setTimeout(() => pushInternalNotif("Sincronización AC", "Día inhábil bloqueando hardware", "#3b82f6"), 600);
+                    },
+                    onLeaveBack: () => {
+                        gsap.to("#ambient-glow", { backgroundColor: "#00fff5", opacity: 0.1 });
+                        gsap.to("#classroom", { opacity: 1, scale: 0.85, x: -140, duration: 0.5 });
+                        gsap.to("#smartphone-wrapper", { x: 180, duration: 1 });
+                    }
+                }
+            });
+            tlNube.to("#big-calendar-mockup", { opacity: 1, x: 0, duration: 1, ease: "back.out" }, 0.5)
+                .to("#cloud-connection-lines", { opacity: 1, duration: 0.5 }, 1)
+                .to("#cal-day-err", { backgroundColor: "rgba(239,68,68,0.2)", duration: 0.5 }, 1.5)
+                .to("#app-header-avatar", { borderColor: "#3b82f6", color: "#3b82f6" }, 1.5);
+
+            const tlSeguridad = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#seguridad", start: "center center", end: "bottom center", scrub: 1,
+                    onEnter: () => {
+                        gsap.to("#ambient-glow", { opacity: 0 });
+                        gsap.to("#big-calendar-mockup", { opacity: 0, scale: 0.9, duration: 0.5 });
+                        gsap.to("#cloud-connection-lines", { opacity: 0, duration: 0.5 });
+                        gsap.to("#smartphone-wrapper", { x: -30, scale: 1.15, zIndex: 100, duration: 1, ease: "power2.out" });
+
+                        gsap.to("#app-lockscreen", { pointerEvents: "auto", opacity: 1, duration: 0.5 });
+                    },
+                    onLeaveBack: () => {
+                        gsap.to("#ambient-glow", { opacity: 0.15 });
+                        gsap.to("#big-calendar-mockup", { opacity: 1, scale: 1, duration: 0.5 });
+                        gsap.to("#cloud-connection-lines", { opacity: 1, duration: 0.5 });
+                        gsap.to("#smartphone-wrapper", { x: 260, scale: 1, duration: 1 });
+
+                        gsap.to("#app-lockscreen", { pointerEvents: "none", opacity: 0, duration: 0.5 });
+                        navApp('dash'); // Reset inner apps
+                    }
+                }
+            });
+
+            // Changed from scrub: true to toggleActions to make it snap and stay perfectly still
+            const tlAnalitica = gsap.timeline({
+                scrollTrigger: {
+                    trigger: "#analitica", start: "center center", toggleActions: "play none none reverse"
+                }
+            });
+            tlAnalitica.to("#ambient-glow", { backgroundColor: "#eab308", opacity: 0.15, duration: 0.5 }, 0)
+                .to("#classroom", { opacity: 0, duration: 0.5 }, 0)
+                .to("#smartphone-wrapper", { x: -150, scale: 1.3, duration: 1, ease: "power3.out" }, 0);
+
+            function loginApp(role) {
+                gsap.to("#app-lockscreen", { opacity: 0, pointerEvents: "none", duration: 0.5 });
+
+                if (role === 'admin') {
+                    gsap.to("#app-header-avatar", { textContent: "👑", borderColor: "#39ff14", color: "#39ff14" });
+                    document.getElementById('admin-config-panel').style.display = 'block';
+                    pushInternalNotif("Login Admin", "Privilegios Jerarquicos Listos", "#39ff14");
+                } else {
+                    gsap.to("#app-header-avatar", { textContent: "👤", borderColor: "#64748b", color: "#64748b" });
+                    document.getElementById('admin-config-panel').style.display = 'none';
+                    pushInternalNotif("Login Usuario", "Vista Informativa Común", "#64748b");
+                }
+            }
+
+        </script>
+</body>
+
+</html>
